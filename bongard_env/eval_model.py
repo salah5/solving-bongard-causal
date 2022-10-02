@@ -13,7 +13,11 @@ from sklearn.manifold import TSNE
 
 
 def plot_bp_ranking(env):
-
+	"""Plots the 9 BPs the agent best performed on
+	
+	Args:
+	    env (gym.Env): environment on which the evaluation was run
+	"""
 	bp_success = list(sorted(env.bp_success.items(), key=lambda item: item[1], reverse=True))
 
 	f = plt.figure()
@@ -26,41 +30,46 @@ def plot_bp_ranking(env):
 		img = np.asarray(img)
 
 		ax = f.add_subplot(rows,cols, i+1)
-		ax.annotate(bp[1], (300,0))
-		ax.annotate(bp[0], (10,0), fontsize=5)
+		ax.annotate(bp[1], (300,0), fontsize=20)
+		ax.annotate(bp[0], (10,0), fontsize=20)
 		ax.axis('off')
 		plt.imshow(img, cmap='Greys_r')
 
 		if i > 7:
 			break
 	
-	f.suptitle("Reward Ranking for each BP")
+	# f.suptitle("Reward Ranking for each BP")
 	# plt.savefig(f'bp_ranking.pdf', dpi=300, bbox='tight')
 
 	plt.show(block=True)
 
 
 
-def plot_feature_space(features, bp_class, same_classes, actions, env, pairs):
-
+def plot_feature_space(env, info_dict):
+	"""Plots a 2d-plot of the feature space for the image comparisons
+	
+	Args:
+	    env (gym.Env): the environment on which the evaluation was run
+	    info_dict (dict): Output dict containing stats about the evaluation
+	"""
 	bp_success = list(sorted(env.bp_success.items(), key=lambda item: item[1], reverse=True))
 
 
-	features = np.array(features)
+	features = np.array(info_dict['features'])
 
 
 	pca = sklearnPCA(n_components=2)
-	# transformed = pca.fit_transform(features)
+	# transformed = pca.fit_transform(info_dict['features'])
 	transformed2 = pca.fit_transform(features)
 
 
 	tsne = TSNE(n_components=2, learning_rate='auto', init='random', perplexity=100)
 	transformed = tsne.fit_transform(features)
 
-	bp_class = np.array(list(map(lambda x: int(x[1:]), bp_class)))
-	same_classes = np.array(same_classes)
-	pairs = np.array(pairs)
-	actions = np.array(actions)
+	bp_class = np.array(list(map(lambda x: int(x[1:]), info_dict['bp_class'])))
+	same_classes = np.array(info_dict['same_classes'])
+	pairs = np.array(info_dict['pairs'])
+	actions = np.array(info_dict['actions'])
 	corrects = (same_classes == actions).astype(int)
 	for i in range(len(same_classes)):
 
@@ -83,78 +92,34 @@ def plot_feature_space(features, bp_class, same_classes, actions, env, pairs):
 	f = plt.figure()
 	rows, cols = 1, 1
 
-
-	# color_class = ['skip', 'same class', 'diferent class']
-	# ax = f.add_subplot(rows,cols, 1)
-	# for action in [0, 1, 2]:
-	# 	ax.scatter(x[actions == action], y[actions == action], label=color_class[action])
-	# 	# ax.scatter(x2[actions == action], y2[actions == action], label=color_class[action])
-	# ax.legend(loc='upper right')
-
-
-	# ax = f.add_subplot(rows,cols, 2)
-	# color_class = ['not top25', 'top25']
-	# top25mask = np.in1d(bp_class, top25bp).astype(int)
-	# for action in [0, 1]:
-	# 	ax.scatter(x[top25mask == action], y[top25mask == action], label=color_class[action])
-	# ax.legend(loc='upper right')
-
 	ax = f.add_subplot(rows,cols, 1)
 	for bp in top10:
 		ax.scatter(x[bp == bp_class], y[bp == bp_class], label=bp)
 	ax.legend(loc='upper right')
 
-
-	# ax = f.add_subplot(rows,cols, 3)
-	# color_class = ['skip', 'correct', 'incorrect']
-	# top25mask = np.in1d(bp_class, top25bp).astype(int)
-	# print(top25mask)
-	# for action in [0, 1, 2]:
-	# 	ax.scatter(x[corrects == action], y[corrects == action], label=color_class[action])
-	# ax.legend(loc='upper right')
-	plt.savefig(f'thesis_figures/BP good model feature space (top9).pdf', dpi=300, bbox='tight')
-
 	plt.show()
 
-	# pairs = pairs[(x < -40) & (y < -70)]
 
-
-	# for pair in pairs:
-
-	# 	f = plt.figure()
-	# 	rows, cols = 1, 2
-
-	# 	path1 =  "BPs/" + pair[0][:4] + "/" + pair[0]
-	# 	path2 =  "BPs/" + pair[1][:4] + "/" + pair[1]
-
-	# 	ax1 = f.add_subplot(rows, cols, 1)
-	# 	ax2 = f.add_subplot(rows, cols, 2)
-
-	# 	img1 = Image.open(path1).convert('1')
-	# 	img1 = np.asarray(img1)
-	# 	ax1.imshow(img1, cmap='Greys_r')
-
-	# 	img2 = Image.open(path2).convert('1')
-	# 	img2 = np.asarray(img2)
-	# 	ax2.imshow(img2, cmap='Greys_r')
-
-	# 	plt.show()
-
-
-
-def eval_model(model, env, feature_space='diff', n_eps=50, render=False, top25=False, bp_ranking=True, bp_feature_space=True):
-
-	#observation = env.reset(init_bps=top10)
+def eval_model(model, env, feature_space='diff', n_eps=50, render=False):
+	"""A function for running an evaluation for a trained agent
+	on an environment
+	
+	Args:
+	    model (TYPE): trained model
+	    env (gym.Env): initialized environment
+	    feature_space (str, optional): the type of feature space to log
+	    n_eps (int, optional): number of episodes for evaluation
+	    render (bool, optional): whether to render the evaluation
+	
+	Returns:
+	    gym.Env, dict: environment on which evaluation was run and dict
+	    			   with logged information of the run
+	"""
 	observation = env.reset()
-	# env.bp_paths = top25bps
 
-	print(env.bp_paths)
+	info_dict = {'bp_class' : [], 'features' : [], 'pairs' : [], 'same_classes' : [], 'actions' : [],}
 
-	bp_class = []
-	features = []
-	pairs = []
-	same_classes = []
-	actions = []
+
 	last_reward = 1
 	for ep in range(n_eps):
 
@@ -170,44 +135,59 @@ def eval_model(model, env, feature_space='diff', n_eps=50, render=False, top25=F
 			current_bp = env.bp_paths[env.bp_i]
 			same_class = env.current_bp_pair[-1]
 
-			pairs.append(env.current_bp_pair)
-
-
-			# print(action)
+			info_dict['pairs'].append(env.current_bp_pair)
 
 			label_map = {'a' : 0, 'b':1}
 
-			#if render and last_reward == 0 and env.reward == 1: # or (render and env.reward == 0):
 			if render and env.reward == 0 or (render and last_reward == 0):
 				env.render()
 
 			last_reward = reward
 
 			if feature_space == 'single':
-				features.append(np.array(feature[1][0].squeeze()))
-				features.append(np.array(feature[1][1].squeeze()))
+				info_dict['features'].append(np.array(feature[1][0].squeeze()))
+				info_dict['features'].append(np.array(feature[1][1].squeeze()))
 				bp_class += [current_bp, current_bp]
 
-				same_classes.append(label_map[env.current_bp_pair[0][-6]])
-				same_classes.append(label_map[env.current_bp_pair[1][-6]])
+				info_dict['same_classes'].append(label_map[env.current_bp_pair[0][-6]])
+				info_dict['same_classes'].append(label_map[env.current_bp_pair[1][-6]])
 
 			elif feature_space == 'diff':
-				features.append(np.array(feature[0].squeeze()))
-				bp_class.append(current_bp)
-				same_classes.append(same_class)
-				actions.append(action)
+				info_dict['features'].append(np.array(feature[0].squeeze()))
+				info_dict['bp_class'].append(current_bp)
+				info_dict['same_classes'].append(same_class)
+				info_dict['actions'].append(action)
 
 			if done:
 				observation = env.reset()
 
-	if bp_ranking:
-		plot_bp_ranking(env, top25=top25)
+	return env, info_dict
 
-	if bp_feature_space:
-		# plot_image_space(features, bp_class, env)
-		plot_feature_space(features, bp_class, same_classes, actions, env, pairs)
+def dict_to_runname(params):
+    """helper function for turning a dict of hyperparameters
+    into a string
+    
+    Args:
+        params (dict): Dictionary of hyperparameters
+    
+    Returns:
+        str: string describing hyperparameters
+    """
+    param_list = []
+    for key, value in params.items():
 
-	# analyze_feature_space(features, bp_class, pairs, same_classes, actions, env)
+        if type(value) == bool:
+            if value:
+                param_list.append(key)
+        elif type(value) == int or type(value) == float:
+            param_list.append(key + str(value))
+        elif type(value) == list:
+            continue
+        elif key in ["env", "algo", "policy", ]:
+            param_list.append(value)
+        else:
+            continue
 
-	sys.exit()
+    run_name = '_'.join(param_list)
 
+    return run_name

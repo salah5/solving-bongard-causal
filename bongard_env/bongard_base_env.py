@@ -14,6 +14,13 @@ from pprint import pprint
 class BPEnv(gym.Env):
 
   def __init__(self, eval=False, ep_length=100, skip_action=True):
+    """Initialize BP environment
+    
+    Args:
+        eval (bool, optional): Eval environment with different set of BPs (currently not in use)
+        ep_length (int, optional): Max length of an episode
+        skip_action (bool, optional): Whether the env has the skip action or not
+    """
     super(BPEnv, self).__init__()
 
     self.ep_length = ep_length

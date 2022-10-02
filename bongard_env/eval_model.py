@@ -3,42 +3,18 @@ import random
 import os
 import sys
 import numpy as np
-from gym import spaces
 from PIL import Image
-import itertools
 import matplotlib.pyplot as plt
 from matplotlib import gridspec
 
-from stable_baselines3.common.evaluation import evaluate_policy
 from sklearn.decomposition import PCA as sklearnPCA
-from sklearn.discriminant_analysis import LinearDiscriminantAnalysis as LDA
 from sklearn.manifold import TSNE
 
-from pprint import pprint
 
-top25bps = ['p073', 'p051', 'p009', 'p078', 'p070', 
-			'p008', 'p069', 'p031', 'p068', 'p023', 
-			'p054', 'p061', 'p022', 'p043', 'p015', 
-			'p085', 'p038', 'p036', 'p053', 'p020', 
-			'p032', 'p065', 'p037', 'p096', 'p047']
 
-top10 = ['p073', 
-		 'p051', 
-		 'p009', 
-		 'p070', 
-		 'p078', 
-		 'p008', 
-		 'p023', 
-		 'p043', 
-		 'p022', 
-		 'p061']
-
-def plot_bp_ranking(env, top25=False):
+def plot_bp_ranking(env):
 
 	bp_success = list(sorted(env.bp_success.items(), key=lambda item: item[1], reverse=True))
-
-	print("TOP 10")
-	print(bp_success[:10])
 
 	f = plt.figure()
 	rows, cols = 10, 10
@@ -59,117 +35,10 @@ def plot_bp_ranking(env, top25=False):
 			break
 	
 	f.suptitle("Reward Ranking for each BP")
-	plt.savefig(f'thesis_figures/BP good model ranking (top9).pdf', dpi=300, bbox='tight')
-
+	# plt.savefig(f'bp_ranking.pdf', dpi=300, bbox='tight')
 
 	plt.show(block=True)
 
-def analyze_feature_space(features, bp_class, pairs, same_classes, actions, env):
-
-	bp_success = list(sorted(env.bp_success.items(), key=lambda item: item[1], reverse=True))
-	features = np.array(features)
-
-
-	tsne = TSNE(n_components=2, learning_rate='auto', init='random', perplexity=100)
-	transformed = tsne.fit_transform(features)
-
-	x = transformed[:,0]
-	y = transformed[:,1]
-	bp_class = np.array(list(map(lambda x: int(x[1:]), bp_class)))
-
-
-	top25bp = [int(x[0][1:]) for x in bp_success[:25]]
-	top10 = top25bp[:10]
-	og_pairs1 = np.array(pairs)[:,0]
-	og_pairs2 = np.array(pairs)[:,1]
-	pairs = [x for x in pairs if int(x[0][1:4]) in top10]
-
-	top10_pairs = []
-	for p in pairs:
-
-		if int(p[0][1:4]) in top10:
-			top10_pairs.append(p)
-
-	for i in range(len(top10_pairs)):
-
-		# if top10_pairs[i][0] != top10_pairs[i][1]:
-		# 	continue
-
-		xpairs = x[(og_pairs1 == top10_pairs[i][0]) & (og_pairs2 == top10_pairs[i][1])]
-		ypairs = y[(og_pairs1 == top10_pairs[i][0]) & (og_pairs2 == top10_pairs[i][1])]
-
-		# if not (np.any([xpairs < -30]) and np.any([ypairs < -50])):
-		# 	continue
-
-		f = plt.figure()
-		rows, cols = 1, 3
-		spec = gridspec.GridSpec(ncols=3, nrows=1,
-                         width_ratios=[1, 1, 3])
-
-
-		pos = 1
-		for image in top10_pairs[i][:2]:
-			img_path = "BPs/" + image[:4] + "/" + image
-			ax = f.add_subplot(spec[pos-1])
-			img = Image.open(img_path).convert('1')
-			img = np.asarray(img)
-			ax.imshow(img, cmap='Greys_r')
-			pos += 1
-
-		ax = f.add_subplot(spec[2])
-		for bp in top10:
-			print(bp)
-			ax.scatter(x[bp == bp_class], y[bp == bp_class], label=bp, alpha=0.1)
-
-		print(top10_pairs[i])
-		print(bp_class[i])
-
-		ax.scatter(x[(og_pairs1 == top10_pairs[i][0]) & (og_pairs2 == top10_pairs[i][1])],
-				   y[(og_pairs1 == top10_pairs[i][0]) & (og_pairs2 == top10_pairs[i][1])], label=int(top10_pairs[i][0][1:4]))
-
-			# filter = []
-			# for k in range(len(og_pairs)):
-			# 	if (og_pairs[k][0] == pairs[i][0]) and (og_pairs[k][1] == pairs[i][1]):
-			# 		filter.append(True)
-			# 	else:
-			# 		filter.append(False)
-
-			# filter = np.array(filter)
-			# ax.scatter(x[filter], y[filter], label=bp, alpha=1)
-			
-
-		ax.legend(loc='upper right')
-
-		plt.show(block=True)
-
-
-def plot_image_space(features, bp_class, env):
-
-	features = np.array(features)
-	bp_class = np.array(list(map(lambda x: int(x[1:]), bp_class)))
-
-	bp_success = list(sorted(env.bp_success.items(), key=lambda item: item[1], reverse=True))
-	top25bp = [int(x[0][1:]) for x in bp_success[:25]]
-	top10 = top25bp[:10]
-
-	tsne = TSNE(n_components=2, learning_rate='auto', init='random', perplexity=100)
-	transformed = tsne.fit_transform(features)
-
-	x = transformed[:,0]
-	y = transformed[:,1]
-
-	f = plt.figure()
-	rows, cols = 1, 1
-
-	ax = f.add_subplot(rows,cols, 1)
-	for bp in top10:
-		ax.scatter(x[bp == bp_class], y[bp == bp_class], label=bp)
-	ax.legend(loc='upper right')
-
-	plt.show()
-
-
-	sys.exit()
 
 
 def plot_feature_space(features, bp_class, same_classes, actions, env, pairs):

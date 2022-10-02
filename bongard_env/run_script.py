@@ -37,7 +37,7 @@ env_dict = {'BPEnv': BPEnv}
 
 params = {
 
-    'env': 'BPEnv2',
+    'env': 'BPEnv',
     'algo': 'PPO',
     'policy': 'SiaMlpPolicy',
     'lr': 7e-05,

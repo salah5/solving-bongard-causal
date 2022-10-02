@@ -14,7 +14,7 @@ from pprint import pprint
 class BPEnv(gym.Env):
 
   def __init__(self, eval=False, ep_length=100, skip_action=True):
-    super(BPEnv2, self).__init__()
+    super(BPEnv, self).__init__()
 
     self.ep_length = ep_length
     self.skip_action = skip_action

@@ -16,8 +16,16 @@ git submodule update --init
 
 ## Step 2:
 
-Install required modules with:
+Install required sb3 submodule with:
 
 ```
+cd sb3
+pip install -e .
+```
+
+Then install bongard module:
+
+```
+cd ..
 pip install -e .
 ```

@@ -41,7 +41,7 @@ params = {
     'log_dir': 'logs/',
     'total_timesteps': 2000000,
     'skip_action' : True,
-    'test_mode': True,
+    'test_mode': False,
     'bp_ranking' : True,
     'bp_feature_space' : True,
     'render' : False,

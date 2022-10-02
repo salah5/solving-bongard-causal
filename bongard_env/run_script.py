@@ -32,7 +32,7 @@ def dict_to_runname(params):
     return run_name
 
 
-algo_dict = {'PPO': PPO, 'A2C': A2C, 'RPPO': RecurrentPPO}
+algo_dict = {'PPO': PPO, 'A2C': A2C}
 env_dict = {'BPEnv': BPEnv}
 
 params = {

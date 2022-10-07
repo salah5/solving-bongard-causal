@@ -6,9 +6,9 @@
 
 ## Step 1: Clone this repository
 
-```
 Python Version: 3.8
 
+```
 git clone https://github.com/salah5/solving-bongard-causal.git
 ```
 
@@ -36,5 +36,5 @@ pip install -e .
 `bongard_env/train_agent.ipynb` shows how to train an agent on the BP environment.
 `bongard_env/evaluate_model.ipynb` shows how to evaluate a trained agent.
 
-You can visualize logs for training stats like avg reward, loss and episode length with tensorboard:
+You can visualize logs for training stats like avg reward, loss and episode length with tensorboard:<br />
 `tensorboard --logdir=<log directory`

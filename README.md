@@ -1,5 +1,9 @@
 # solving-bongard-causal
 
+![alt text](https://www.foundalis.com/res/bps/bongard/p049.gif)
+
+Python Version: 3.8
+
 ## Step 1: Clone this repository
 
 ```

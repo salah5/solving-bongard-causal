@@ -19,35 +19,30 @@ from eval_model import eval_model, plot_bp_ranking, plot_feature_space, dict_to_
 
 
 
-
-
 algo_dict = {'PPO': PPO, 'A2C': A2C}
 env_dict = {'BPEnv': BPEnv}
 
 params = {
 
-    'env': 'BPEnv',
-    'algo': 'PPO',
-    'policy': 'SiaMlpPolicy',
-    'lr': 7e-05,
-    'eplength': False,
-    'CB': False,
-    'clip_range': 0.2,
-    'save_model': False,
-    'run_name' : 'BPEnv2_PPO_SiaMlpPolicy_lr1e-05_clip_range0.2_27',
-    'seeds':  [11, 61, 331],
-    'lrs': [1e-05, 3e-05, 4e-05, 5e-05, 7e-05, 9e-05],
-    'clip_ranges': [0.2, 0.1, 0.05, 0.4],
-    'log_dir': 'logs/',
-    'total_timesteps': 2000000,
-    'skip_action' : True,
-    'test_mode': False,
-    'bp_ranking' : True,
-    'bp_feature_space' : True,
-    'render' : False,
+    'env': 'BPEnv', # Environment for training the agent
+    'algo': 'PPO', # Algorithm used for training
+    'policy': 'SiaMlpPolicy', # Network architecture for policy
+    'lr': 7e-05, # Learning rate
+    'eplength': False, # Episode length
+    'CB': False, # Causal Bounds
+    'clip_range': 0.2, # PPO clipping range
+    'save_model': False, # Whether to save model or not
+    'run_name' : 'BPEnv2_PPO_SiaMlpPolicy_lr1e-05_clip_range0.2_27', # Runname for saving model, if empty name will be generated from parameters
+    'seeds':  [11, 61, 331], # Random seeds to train on
+    'log_dir': 'logs/', # Log directory used for tensorboard logs
+    'total_timesteps': 2000000, # Total timesteps for training
+    'skip_action' : True, # Whether to include skip action or not (not at the same time with CB)
+    'test_mode': False, # Testing mode for agent
+    'bp_ranking' : True, # Plot ranking for BPs with best performance
+    'bp_feature_space' : True, # Plot feature space of BPs
+    'render' : False, # Render decision sequences of agent
     
 }
-
 
 env = env_dict[params['env']](skip_action=params['skip_action'])
 

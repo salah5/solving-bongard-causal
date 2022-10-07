@@ -1,6 +1,8 @@
 # solving-bongard-causal
 
-![alt text](https://www.foundalis.com/res/bps/bongard/p049.gif)
+<p align="center">
+  <img src="https://www.foundalis.com/res/bps/bongard/p049.gif" />
+</p>
 
 Python Version: 3.8
 

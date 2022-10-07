@@ -37,4 +37,4 @@ pip install -e .
 `bongard_env/evaluate_model.ipynb` shows how to evaluate a trained agent.
 
 You can visualize logs for training stats like avg reward, loss and episode length with tensorboard:<br />
-`tensorboard --logdir=<log directory`
+`tensorboard --logdir=<log directory>`

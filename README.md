@@ -21,14 +21,11 @@ git submodule update --init
 ## Step 2: Install required modules
 
 ```
-cd bongard_env
-pip install -r requirements.txt
+pip install -r bongard_env/requirements.txt
 ```
 
 ```
-cd ..
-cd sb3
-pip install -e .
+pip install -e sb3/
 ```
 
 ## Examples on how to train or evaluate an agent can be found in the corresponding jupyter notebooks
